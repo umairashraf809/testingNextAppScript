@@ -71,7 +71,7 @@ const replaceMetaData = metaData => {
     const titles = document.querySelectorAll('title');
     if (titles?.length) {
       titles?.forEach(item => {
-        item.remove();
+        // item.remove();
       });
     }
     headerElementExist = false;
@@ -95,9 +95,11 @@ const replaceMetaData = metaData => {
     if (type === 'title') {
       consolePrint(`Header Title Not Found - ${type}`);
       headerTitleTagCount++;
-      const titleTag = `<title>${recommended_value}</title>`;
-      consolePrint(`Inserting Title tag element: ${titleTag}`);
-      document.head.insertAdjacentHTML('afterbegin', titleTag);
+      // const titleTag = `<title>${recommended_value}</title>`;
+      // consolePrint(`Inserting Title tag element: ${titleTag}`);
+      // document.head.insertAdjacentHTML('afterbegin', titleTag);
+      const title = document.querySelector(‘title’);
+      title.innerHTML = recommended_value;
     } else {
       consolePrint(`Header Meta Not Found - ${type}`);
       const metaAttribute = property ? 'property' : 'name';
