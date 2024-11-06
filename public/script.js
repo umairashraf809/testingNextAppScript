@@ -20,11 +20,12 @@ const fetchData = async (pageUrl, uuid) => {
   if (uuid) apiUrl += `&uuid=${uuid}`;
   try {
     const response = await fetch(apiUrl);
+    
     if (!response.ok) throw new Error('API call failed.');
     const pageData = await response.json();
     consolePrint(`API response: ${pageData}`);
-    // todo: apply condition to check if current window url is equal to pageUrl param
-    applyPageData(pageData);
+    console.log({pageUrl}, window.location.origin + window.location.pathname);
+    if ((window.location.origin + window.location.pathname) === pageUrl) applyPageData(pageData);
   } catch (error) {
     console.error('Fetch error:', error);
   }
@@ -61,7 +62,6 @@ const replaceMetaData = metaData => {
   if (type === 'title') {
     const titles = document.querySelectorAll('title');
     if (titles?.length) {
-      console.log({titles});
       titles?.forEach(item => {
         if (!window?.next) item.remove();
       });
@@ -227,14 +227,50 @@ const applyPageData = pageData => {
 };
 // Function to remove content between specific comments
 const removeDynamicOptimizationContent = () => {
+//   removelist = [
+//     'Header',
+//     'Footer',
+//     'Body Top',
+//     'Body Bottom',
+//   ]
   const elementsToRemove = document.querySelectorAll('[data-otto-pixel="dynamic-seo"]');
   if (elementsToRemove.length > 0) {
     try {
-      elementsToRemove.forEach(element => element?.remove());
+        elementsToRemove.forEach(element => element?.remove());
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
   }
+//   removelist.forEach(item => {
+    
+//     let htmlContent = null
+//     // Get all the HTML content as a string
+//     if(item == 'Header'){
+//       htmlContent = document.head.innerHTML;  
+//     } else{
+//       htmlContent = document.body.innerHTML;
+//     }
+//     // Define the start and end markers
+//     const startMarker = `<!-- Dynamic Optimization ${item} Integration Start -->`;
+//     const endMarker = `<!-- Dynamic Optimization ${item} Integration Ended -->`;
+//     // Check if the markers exist
+//     if (htmlContent?.includes(startMarker) && htmlContent?.includes(endMarker)) {
+//       // Extract content before and after the markers
+//       const beforeStart = htmlContent?.split(startMarker)[0];
+//       const afterEnd = htmlContent?.split(endMarker)[1];
+//       // Combine the remaining content
+//       const updatedContent = beforeStart + afterEnd;
+//       // Update the HTML content in the body
+//       if(item == 'Header'){
+//         document.head.innerHTML = updatedContent;
+//       }else{
+//         document.body.innerHTML = updatedContent;
+//       }
+//       consolePrint('Dynamic Optimization content removed.');
+//     } else {
+//       consolePrint('Markers not found.');
+//     }
+//   });
 }
 const initializeScript = () => {
   consolePrint('Script initialization');
@@ -250,7 +286,7 @@ const initializeScript = () => {
       window.dispatchEvent(new Event('locationchange'));
     };
     window.addEventListener('locationchange', () => {
-      removeDynamicOptimizationContent()
+      removeDynamicOptimizationContent();
       fetchData(window.location.origin + window.location.pathname, uuid);
       postPageCrawlLogs(window.location.href, uuid, null);
     });
