@@ -98,7 +98,7 @@ const replaceMetaData = metaData => {
       // const titleTag = `<title>${recommended_value}</title>`;
       // consolePrint(`Inserting Title tag element: ${titleTag}`);
       // document.head.insertAdjacentHTML('afterbegin', titleTag);
-      const title = document.querySelector(‘title’);
+      const title = document.querySelector('title');
       title.innerHTML = recommended_value;
     } else {
       consolePrint(`Header Meta Not Found - ${type}`);
