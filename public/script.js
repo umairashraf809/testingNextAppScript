@@ -8,44 +8,38 @@ let linksUpdationCount = 0;
 const headersUpdationCount = {h1: 0, h2: 0, h3: 0, h4: 0, h5: 0, h6: 0};
 let imagesAltsUpdationCount = 0;
 let footerHtmlInsertionCount = 0;
-
 const urlParams = new URLSearchParams(window.location.search);
 const diagnosticsExist = urlParams.has('diagnostics');
-
 const consolePrint = strData => {
   if (diagnosticsExist) {
     console.log(strData);
   }
 };
-
 const fetchData = async (pageUrl, uuid) => {
   let apiUrl = `https://sa.searchatlas.com/api/v2/otto-url-details/?url=${pageUrl}`;
   if (uuid) apiUrl += `&uuid=${uuid}`;
-
   try {
     const response = await fetch(apiUrl);
     if (!response.ok) throw new Error('API call failed.');
     const pageData = await response.json();
     consolePrint(`API response: ${pageData}`);
+    // todo: apply condition to check if current window url is equal to pageUrl param
     applyPageData(pageData);
   } catch (error) {
     console.error('Fetch error:', error);
   }
 };
-
 const postPageCrawlLogs = async (pageUrl, uuid, context) => {
   try {
     const useragent = navigator.userAgent;
     if (useragent.includes('bot')) {
       const apiUrl = `https://sa.searchatlas.com/api/v2/otto-page-crawl-logs/`;
-
       const bodyData = {
         otto_uuid: uuid,
         url: pageUrl,
         user_agent: useragent,
         context: context,
       };
-
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -53,7 +47,6 @@ const postPageCrawlLogs = async (pageUrl, uuid, context) => {
         },
         body: JSON.stringify(bodyData),
       });
-
       if (!response.ok) throw new Error('API call failed.');
       const pageData = await response.json();
       consolePrint(`API response: ${pageData}`);
@@ -62,16 +55,15 @@ const postPageCrawlLogs = async (pageUrl, uuid, context) => {
     consolePrint(`Fetch error: ${error}`);
   }
 };
-
 const replaceMetaData = metaData => {
   let headerElementExist = false;
   const {type, name, property, recommended_value} = metaData;
-
   if (type === 'title') {
     const titles = document.querySelectorAll('title');
     if (titles?.length) {
+      console.log({titles});
       titles?.forEach(item => {
-        // item.remove();
+        if (!window?.next) item.remove();
       });
     }
     headerElementExist = false;
@@ -79,7 +71,6 @@ const replaceMetaData = metaData => {
     const metaSelector = `meta[name="${(name || property)?.trim()}"], meta[property="${(name || property)?.trim()}"]`;
     headerElementExist = document.querySelector(metaSelector) || false;
   }
-
   if (headerElementExist) {
     consolePrint(`Header Meta - ${headerElementExist}`);
     if (type === 'title') {
@@ -95,11 +86,14 @@ const replaceMetaData = metaData => {
     if (type === 'title') {
       consolePrint(`Header Title Not Found - ${type}`);
       headerTitleTagCount++;
-      // const titleTag = `<title>${recommended_value}</title>`;
-      // consolePrint(`Inserting Title tag element: ${titleTag}`);
-      // document.head.insertAdjacentHTML('afterbegin', titleTag);
-      const title = document.querySelector('title');
-      title.innerHTML = recommended_value;
+      if (window?.next) {
+        const title = document.querySelector('title');
+        title.innerHTML = recommended_value;
+      } else {
+        const titleTag = `<title>${recommended_value}</title>`;
+        consolePrint(`Inserting Title tag element: ${titleTag}`);
+        document.head.insertAdjacentHTML('afterbegin', titleTag);
+      }
     } else {
       consolePrint(`Header Meta Not Found - ${type}`);
       const metaAttribute = property ? 'property' : 'name';
@@ -110,7 +104,6 @@ const replaceMetaData = metaData => {
     }
   }
 };
-
 const addAltTextToImages = images => {
   const allImgsElements = document.querySelectorAll(`img`);
   allImgsElements?.forEach(imgElement => {
@@ -126,12 +119,10 @@ const addAltTextToImages = images => {
   });
   consolePrint(`Total alt texts updated: ${imagesAltsUpdationCount}`);
 };
-
 const htmlDecode = input => {
   const doc = new DOMParser().parseFromString(input, 'text/html');
   return doc.documentElement.textContent;
 };
-
 const applyPageData = pageData => {
   consolePrint(`Header HTML insertion started: ${pageData.header_html_insertion}`);
   const htmlToInject = pageData.header_html_insertion ? `<!-- Dynamic Optimization Header Integration Start --> ${pageData.header_html_insertion} <!-- Dynamic Optimization Header Integration Ended --> ` : '';
@@ -140,7 +131,6 @@ const applyPageData = pageData => {
     headerInsertionCount++;
   }
   consolePrint(`Header HTML insertion ended: ${htmlToInject}`);
-
   try {
     consolePrint(`Header replacements started: ${pageData.header_replacements}`);
     if (Array.isArray(pageData.header_replacements)) {
@@ -152,9 +142,7 @@ const applyPageData = pageData => {
   } catch (error) {
     consolePrint(`Header replacements Error: ${error}`);
   }
-
   const bodyElement = document.querySelector('body');
-
   consolePrint(`Body top HTML insertion started: ${pageData.body_top_html_insertion}`);
   const topHtmlToInject = pageData.body_top_html_insertion ? `<!-- Dynamic Optimization Body Top Integration Start --> ${pageData.body_top_html_insertion} <!-- Dynamic Optimization Body Top Integration Ended --> ` : '';
   if (topHtmlToInject) {
@@ -162,7 +150,6 @@ const applyPageData = pageData => {
     bodyElement.insertAdjacentHTML('afterbegin', topHtmlToInject);
   }
   consolePrint(`Body top HTML insertion ended: ${topHtmlToInject}`);
-
   consolePrint(`Body bottom HTML insertion started: ${pageData.body_bottom_html_insertion}`);
   const bottomHtmlToInject = pageData.body_bottom_html_insertion ? `<!-- Dynamic Optimization Body Bottom Integration Start --> ${pageData.body_bottom_html_insertion} <!-- Dynamic Optimization Body Bottom Integration Ended --> ` : '';
   if (bottomHtmlToInject) {
@@ -170,7 +157,6 @@ const applyPageData = pageData => {
     bodyElement.insertAdjacentHTML('beforeend', bottomHtmlToInject);
   }
   consolePrint(`Body bottom HTML insertion ended: ${bottomHtmlToInject}`);
-
   consolePrint('Body substitutions started');
   for (const [bodySubstitutionsKey, data] of Object.entries(pageData.body_substitutions)) {
     if (bodySubstitutionsKey !== 'images') {
@@ -198,7 +184,6 @@ const applyPageData = pageData => {
     }
   }
   consolePrint('Body substitutions ended');
-
   if (pageData.header_replacements?.length > 0) {
     const canonicalLink = pageData.header_replacements.find(item=> item?.type == 'link' && item?.rel == 'canonical');
     const element = document.querySelector(`link[rel="canonical"]`);
@@ -206,11 +191,9 @@ const applyPageData = pageData => {
       element.href = canonicalLink?.recommended_value;
     }
   }
-
   consolePrint('Intersection of missing alt tags started');
   pageData?.body_substitutions?.images && addAltTextToImages(Object.entries(pageData?.body_substitutions?.images));
   consolePrint('Intersection of missing alt tags ended');
-
   consolePrint(`Footer HTML insertion started: ${pageData.footer_html_insertion}`);
   if (pageData.footer_html_insertion) {
     let footerElement = document.querySelector('footer');
@@ -220,14 +203,12 @@ const applyPageData = pageData => {
       document.body.appendChild(footerElement);
       consolePrint('Footer element added to footer');
     }
-
     const footerHtmlToInject = pageData.footer_html_insertion ? `<!-- Dynamic Optimization Footer Integration Start --> ${pageData.footer_html_insertion} <!-- Dynamic Optimization Footer Integration Ended --> ` : '';
     footerHtmlInsertionCount++;
     footerElement.insertAdjacentHTML('beforeend', footerHtmlToInject);
     consolePrint(`Footer HTML inserted: ${footerHtmlToInject}`);
   }
   consolePrint(`Footer HTML insertion ended: ${pageData.footer_html_insertion}`);
-
   consolePrint('*************************************************************');
   consolePrint('******************** Diagnostics Summary ********************');
   consolePrint(`Header Insertions: ${headerInsertionCount}`);
@@ -235,7 +216,6 @@ const applyPageData = pageData => {
   consolePrint(`Body Top HTML Insertions: ${bodyHtmlTopInsertionCount}`);
   consolePrint(`Body Bottom HTML Insertions: ${bodyHtmlBottomInsertionCount}`);
   consolePrint(`Footer HTML Insertions: ${footerHtmlInsertionCount}`);
-
   consolePrint(`Header Meta Tag Updated: ${headerMetaTagCount} out of ${Array.isArray(pageData.header_replacements) ? pageData.header_replacements?.filter(item => item.type != 'title')?.length : 0}`);
   consolePrint(`Image Alt Replacements: ${imagesAltsUpdationCount} out of ${('images' in pageData.body_substitutions) ? Object.keys(pageData.body_substitutions?.images)?.length : 0}`);
   consolePrint(`Link Replacements: ${linksUpdationCount} out of ${('links' in pageData.body_substitutions) ? Object.keys(pageData.body_substitutions?.links)?.length : 0}`);
@@ -245,62 +225,17 @@ const applyPageData = pageData => {
   consolePrint('*************************************************************');
   consolePrint('*************************************************************');
 };
-
 // Function to remove content between specific comments
 const removeDynamicOptimizationContent = () => {
-//   removelist = [
-//     'Header',
-//     'Footer',
-//     'Body Top',
-//     'Body Bottom',
-//   ]
-
   const elementsToRemove = document.querySelectorAll('[data-otto-pixel="dynamic-seo"]');
   if (elementsToRemove.length > 0) {
     try {
-        elementsToRemove.forEach(element => element?.remove());
+      elementsToRemove.forEach(element => element?.remove());
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
   }
-
-//   removelist.forEach(item => {
-    
-//     let htmlContent = null
-//     // Get all the HTML content as a string
-//     if(item == 'Header'){
-//       htmlContent = document.head.innerHTML;  
-//     } else{
-//       htmlContent = document.body.innerHTML;
-//     }
-
-//     // Define the start and end markers
-//     const startMarker = `<!-- Dynamic Optimization ${item} Integration Start -->`;
-//     const endMarker = `<!-- Dynamic Optimization ${item} Integration Ended -->`;
-
-//     // Check if the markers exist
-//     if (htmlContent?.includes(startMarker) && htmlContent?.includes(endMarker)) {
-//       // Extract content before and after the markers
-//       const beforeStart = htmlContent?.split(startMarker)[0];
-//       const afterEnd = htmlContent?.split(endMarker)[1];
-
-//       // Combine the remaining content
-//       const updatedContent = beforeStart + afterEnd;
-
-//       // Update the HTML content in the body
-//       if(item == 'Header'){
-//         document.head.innerHTML = updatedContent;
-//       }else{
-//         document.body.innerHTML = updatedContent;
-//       }
-
-//       consolePrint('Dynamic Optimization content removed.');
-//     } else {
-//       consolePrint('Markers not found.');
-//     }
-//   });
 }
-
 const initializeScript = () => {
   consolePrint('Script initialization');
   const uuid = document.getElementById('sa-otto')?.getAttribute('data-uuid') || document.getElementById('searchatlas')?.getAttribute('data-uuid') || document.getElementById('sa-dynamic-optimization')?.getAttribute('data-uuid');
@@ -327,5 +262,4 @@ const initializeScript = () => {
   postPageCrawlLogs(window.location.href, uuid, null);
   consolePrint('Script ended');
 };
-
 initializeScript();
