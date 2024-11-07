@@ -1,10 +1,6 @@
 import React from 'react'
 import './page.css';
 
-export async function getStaticProps() {
-    return { props: {} };
-}
-
 const Contact = () => {
     console.log('ContactContactContact');
 

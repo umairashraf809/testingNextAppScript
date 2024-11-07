@@ -1,10 +1,6 @@
 import Link from "next/link";
 import './page.css';
 
-export async function getStaticProps() {
-    return { props: {} };
-}
-
 export default function HomePage() {
 
     return (
