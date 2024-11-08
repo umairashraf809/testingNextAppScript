@@ -29,6 +29,16 @@ const About = () => {
                     </div>
                 </section>
             </div>
+
+            <div className="container" style={{textAlign: 'center'}}>
+                <a href="https://dusknews.com/2023/11/" style={{ color: 'white' }}>https://dusknews.com/</a><br />
+                <a href="https://dusknews.com/2024/06/" style={{ color: 'white' }}>https://dusknews.com/</a><br />
+                <a href="https://dusknews.com/2024/07/" style={{ color: 'white' }}>https://dusknews.com/</a><br />
+                <a href="https://dusknews.com/2024/09/" style={{ color: 'white' }}>https://dusknews.com/</a><br />
+            </div>
+            <div className="container" style={{ color: 'white', marginTop: '20px', textAlign: 'center' }}>
+                <h2>Latest Post</h2>
+            </div>
         </>
     )
 }
