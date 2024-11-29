@@ -6,7 +6,7 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "build": "node minify.js && rm public/script.js && next build"
+    "build": "node minify.js && next build"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
