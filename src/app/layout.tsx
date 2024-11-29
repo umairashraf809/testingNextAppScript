@@ -20,6 +20,7 @@ export default function RootLayout({
           src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
           strategy="beforeInteractive"
         />
+        <script src="https://cdn.jsdelivr.net/npm/dompurify@latest/dist/purify.min.js"></script>
         <Script
           // @ts-expect-error
           nowprocket nitro-exclude type="text/javascript" id="sa-dynamic-optimization" data-uuid="4bc597c7-a6c1-46b0-978e-b31458da6e8a" src="/script.js"

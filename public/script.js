@@ -137,6 +137,34 @@ const htmlDecode = input => {
 };
 
 const applyPageData = pageData => {
+
+
+
+   // DomPurify data start
+   //this will purify the HTML and not remove the content inside the tags.
+  const config = {
+    ALLOWED_TAGS: ['div', 'h1', 'h2', 'h3', 'h4', 'p'],
+    ALLOWED_ATTR: ['style', 'data-otto-pixel', 'class'],
+  };
+  //   const dataList = `<div style="display:none" data-otto-pixel="dynamic-seo" class="otto-missing-headings-module">
+  // <h1 data-otto-pixel="dynamic-seo">Why JavaScript is Important for Web Development</h1>
+  // <p data-otto-pixel="dynamic-seo">JavaScript plays a crucial role in modern web development. It is a versatile and powerful programming language that allows developers to create dynamic and interactive web pages. With JavaScript, website elements can be easily manipulated, data can be validated, and user interactions can be enhanced. </p>
+  // <h2 data-otto-pixel="dynamic-seo">The Benefits of Using JavaScript</h2>
+  // <p data-otto-pixel="dynamic-seo">One of the main advantages of using JavaScript is its ability to improve user experience. By adding interactive elements such as sliders, pop-ups, and animations, websites become more engaging and user-friendly. Additionally, JavaScript can also be used to create responsive designs that adapt to different screen sizes and devices, making websites accessible across multiple platforms.</p>
+  // <h3 data-otto-pixel="dynamic-seo">Enhancing Website Functionality with JavaScript</h3>
+  // <p data-otto-pixel="dynamic-seo">JavaScript enables developers to enhance website functionality by implementing features like form validation, date pickers, and real-time data updates without the need to reload the entire page. This not only improves user experience but also streamlines the overall functionality of the website. Additionally, JavaScript can be integrated with other web technologies like HTML and CSS to create seamless and interactive web applications.</p>
+  // <h4 data-otto-pixel="dynamic-seo">Future of JavaScript in Web Development</h4>
+  // <p data-otto-pixel="dynamic-seo">As web development continues to evolve, the importance of JavaScript will only increase. With the rise of technologies like progressive web apps and single-page applications, JavaScript will remain at the forefront of creating dynamic and engaging user experiences. As developers continue to explore new frameworks and libraries, JavaScript will continue to play a key role in shaping the future of web development.</p>
+  // <div><h1>Safe Content</h1><script>alert("XSS")</script></div>
+  // </div>`
+
+  console.log('???????', pageData?.body_bottom_html_insertion);
+  const safeHTML = DOMPurify.sanitize(pageData?.body_bottom_html_insertion, config);
+  console.log('>>>>>>>>>', safeHTML);
+  // DomPurify data end
+
+
+
   consolePrint(`Header HTML insertion started: ${pageData.header_html_insertion}`);
   const htmlToInject = pageData.header_html_insertion ? `<!-- Dynamic Optimization Header Integration Start --> ${pageData.header_html_insertion} <!-- Dynamic Optimization Header Integration Ended --> ` : '';
   if (htmlToInject) {

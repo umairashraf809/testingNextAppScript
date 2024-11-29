@@ -4,15 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build": "node minify.js && rm public/script.js && next build"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "dompurify": "^3.2.1",
     "next": "14.2.16",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "terser": "^5.36.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -20,6 +22,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.16",
+    "terser-webpack-plugin": "^5.3.10",
     "typescript": "^5"
   }
 }
